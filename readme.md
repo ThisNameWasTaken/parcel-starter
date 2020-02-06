@@ -9,6 +9,7 @@ npm start
 ```
 
 Starts development server on [http://localhost:1234](http://localhost:1234).
+
 To change the host and port run `npm start -- --host local.my-host.com --port 3000`
 
 ```sh
@@ -16,6 +17,7 @@ npm run build
 ```
 
 Builds for production into a folder called.
+
 To change the folder's name run `npm run build -- -out-dir custom-named-folder`.
 
 For more flags checkout [Parcel's CLI](https://parceljs.org/cli.html) Docs.
