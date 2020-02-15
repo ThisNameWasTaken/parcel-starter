@@ -16,7 +16,7 @@ To change the host and port run `npm start -- --host local.my-host.com --port 30
 npm run build
 ```
 
-Builds for production into a folder called 'dist'.
+Builds for production into a folder called `dist`.
 
 To change the folder's name run `npm run build -- -out-dir custom-named-folder`.
 
