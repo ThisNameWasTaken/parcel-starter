@@ -3,8 +3,11 @@ const canvas = document.getElementById('canvas');
 const canvasOptions = {
   width: window.innerWidth,
   height: window.innerHeight,
+};
+
+const penOptions = {
   fillColor: '#48f',
-  lineWidth: 50,
+  size: 50,
 };
 
 const hitOptions = {
@@ -26,14 +29,11 @@ document.body.addEventListener('pointerdown', startDrawing, { passive: true });
 document.body.addEventListener('pointermove', draw, { passive: true });
 
 document.body.addEventListener('pointerup', stopDrawing, { passive: true });
-// window.addEventListener('pointerout', stopDrawing, { passive: true });
-// window.addEventListener('pointerleave', stopDrawing, { passive: true });
-// window.addEventListener('pointercancel', stopDrawing, { passive: true });
 
 // Draw inner shape
-ctx.fillStyle = canvasOptions.fillColor;
-ctx.strokeStyle = canvasOptions.fillColor;
-ctx.lineWidth = canvasOptions.lineWidth;
+ctx.fillStyle = penOptions.fillColor;
+ctx.strokeStyle = penOptions.fillColor;
+ctx.lineWidth = penOptions.size;
 ctx.lineCap = 'round';
 ctx.lineJoin = 'round';
 
@@ -69,9 +69,9 @@ function clearCanvas() {
   ctx.clearRect(0, 0, canvasOptions.width, canvasOptions.height);
 }
 
-function drawCircle(x, y, radius = canvasOptions.lineWidth) {
+function drawDot(x, y) {
   ctx.beginPath();
-  ctx.arc(x, y, radius, 0, 2 * Math.PI);
+  ctx.arc(x, y, 1, 0, 2 * Math.PI);
   ctx.fill();
 }
 
@@ -110,14 +110,14 @@ function calculateSurface() {
   ctx.fillStyle = hitOptions.fillColor;
   ctx.strokeStyle = hitOptions.fillColor;
 
-  hits.forEach(hit => drawCircle(...hit, 1));
+  hits.forEach(hit => drawDot(...hit, 1));
 
   ctx.fillStyle = missOptions.fillColor;
   ctx.strokeStyle = missOptions.fillColor;
-  misses.forEach(hit => drawCircle(...hit, 1));
+  misses.forEach(hit => drawDot(...hit, 1));
 
-  ctx.fillStyle = canvasOptions.fillColor;
-  ctx.strokeStyle = canvasOptions.fillColor;
+  ctx.fillStyle = penOptions.fillColor;
+  ctx.strokeStyle = penOptions.fillColor;
 
   const pointsCount = hits.length + misses.length;
   const hitsCount = hits.length;
