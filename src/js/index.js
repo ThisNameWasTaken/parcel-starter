@@ -3,6 +3,8 @@ const canvas = document.getElementById('canvas');
 const canvasOptions = {
   width: window.innerWidth,
   height: window.innerHeight,
+  fillColor: '#48f',
+  lineWidth: 50,
 };
 
 canvas.setAttribute('width', `${canvasOptions.width}px`);
@@ -21,9 +23,7 @@ window.addEventListener('pointerleave', stopDrawing, { passive: true });
 window.addEventListener('pointercancel', stopDrawing, { passive: true });
 
 // Draw inner shape
-ctx.fillStyle = '#48f';
-ctx.strokeStyle = '#48f';
-ctx.lineWidth = 50;
+ctx.fillStyle = canvasOptions.fillColor;
 ctx.lineCap = 'round';
 
 let isDrawing = false;
@@ -36,30 +36,35 @@ function startDrawing(event) {
 function draw(event) {
   if (!isDrawing) return;
 
-  ctx.lineTo(event.clientX, event.clientY);
-  ctx.stroke();
+  const stepCount = Math.max(
+    Math.abs(event.movementX),
+    Math.abs(event.movementY)
+  );
+  const xStep = event.movementX / stepCount;
+  const yStep = event.movementY / stepCount;
+
+  for (let i = 0; i <= stepCount; i++) {
+    drawCircle(event.clientX + i * xStep, event.clientY + i * yStep);
+  }
 }
 
 function stopDrawing(event) {
   isDrawing = false;
-  calculateSurface();
+  // calculateSurface();
 }
 
 function clearCanvas() {
   ctx.clearRect(0, 0, canvasOptions.width, canvasOptions.height);
-  ctx.beginPath();
 }
 
-// ctx.moveTo(120, 120);
-// ctx.lineTo(250, 120);
-// ctx.lineTo(250, 250);
-// ctx.lineTo(120, 250);
-// ctx.lineTo(120, 120);
-
-// ctx.closePath();
+function drawCircle(x, y, radius = canvasOptions.lineWidth) {
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, 2 * Math.PI);
+  ctx.fill();
+}
 
 function calculateSurface() {
-  const screenPercentage = 0.001;
+  const screenPercentage = 0.01;
 
   const randomPointsCount = Math.floor(
     canvasOptions.height * canvasOptions.width * screenPercentage
@@ -91,8 +96,9 @@ function calculateSurface() {
 
   const pointsCount = hits.length + misses.length;
   const hitsCount = hits.length;
-  const surface =
-    (hitsCount / pointsCount) * (canvasOptions.width * canvasOptions.height);
+  const surface = Math.floor(
+    (hitsCount / pointsCount) * (canvasOptions.width * canvasOptions.height)
+  );
 
   console.log({ surface });
 }
