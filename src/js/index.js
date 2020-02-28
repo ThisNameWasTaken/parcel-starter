@@ -1,3 +1,11 @@
+const canvasWorker = new Worker('./canvasWorker.js');
+
+canvasWorker.postMessage({ dolor: 'sit' });
+canvasWorker.addEventListener('message', event => {
+  console.log('received');
+  console.log(event);
+});
+
 const canvas = document.getElementById('canvas');
 
 const canvasOptions = {
