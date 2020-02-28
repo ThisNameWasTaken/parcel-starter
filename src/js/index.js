@@ -7,50 +7,62 @@ const canvasOptions = {
   lineWidth: 50,
 };
 
+const hitOptions = {
+  fillColor: '#4f3',
+};
+
+const missOptions = {
+  fillColor: '#f43',
+};
+
 canvas.setAttribute('width', `${canvasOptions.width}px`);
 canvas.setAttribute('height', `${canvasOptions.height}px`);
 
 /** @type {CanvasRenderingContext2D} */
 const ctx = canvas.getContext('2d');
 
-window.addEventListener('pointerdown', startDrawing, { passive: true });
+document.body.addEventListener('pointerdown', startDrawing, { passive: true });
 
-window.addEventListener('pointermove', draw, { passive: true });
+document.body.addEventListener('pointermove', draw, { passive: true });
 
-window.addEventListener('pointerup', stopDrawing, { passive: true });
-window.addEventListener('pointerout', stopDrawing, { passive: true });
-window.addEventListener('pointerleave', stopDrawing, { passive: true });
-window.addEventListener('pointercancel', stopDrawing, { passive: true });
+document.body.addEventListener('pointerup', stopDrawing, { passive: true });
+// window.addEventListener('pointerout', stopDrawing, { passive: true });
+// window.addEventListener('pointerleave', stopDrawing, { passive: true });
+// window.addEventListener('pointercancel', stopDrawing, { passive: true });
 
 // Draw inner shape
 ctx.fillStyle = canvasOptions.fillColor;
+ctx.strokeStyle = canvasOptions.fillColor;
+ctx.lineWidth = canvasOptions.lineWidth;
 ctx.lineCap = 'round';
+ctx.lineJoin = 'round';
 
+let prevX;
+let prevY;
 let isDrawing = false;
 function startDrawing(event) {
   clearCanvas();
-  ctx.moveTo(event.clientX, event.clientY);
+  ctx.beginPath();
   isDrawing = true;
+  prevX = event.clientX;
+  prevY = event.clientY;
 }
 
 function draw(event) {
   if (!isDrawing) return;
 
-  const stepCount = Math.max(
-    Math.abs(event.movementX),
-    Math.abs(event.movementY)
-  );
-  const xStep = event.movementX / stepCount;
-  const yStep = event.movementY / stepCount;
+  ctx.moveTo(prevX, prevY);
+  ctx.lineTo(event.clientX, event.clientY);
+  ctx.stroke();
 
-  for (let i = 0; i <= stepCount; i++) {
-    drawCircle(event.clientX + i * xStep, event.clientY + i * yStep);
-  }
+  prevX = event.clientX;
+  prevY = event.clientY;
 }
 
 function stopDrawing(event) {
+  ctx.closePath();
   isDrawing = false;
-  // calculateSurface();
+  calculateSurface();
 }
 
 function clearCanvas() {
@@ -83,7 +95,8 @@ function calculateSurface() {
     const randomX = randomBetween(0, canvasOptions.width);
     const randomY = randomBetween(0, canvasOptions.height);
 
-    if (ctx.isPointInPath(randomX, randomY)) {
+    const alpha = ctx.getImageData(randomX, randomY, 1, 1).data[3];
+    if (alpha !== 0) {
       if (!hits.find(equalsPoint(randomX, randomY))) {
         hits.push([randomX, randomY]);
       }
@@ -93,6 +106,18 @@ function calculateSurface() {
       }
     }
   }
+
+  ctx.fillStyle = hitOptions.fillColor;
+  ctx.strokeStyle = hitOptions.fillColor;
+
+  hits.forEach(hit => drawCircle(...hit, 1));
+
+  ctx.fillStyle = missOptions.fillColor;
+  ctx.strokeStyle = missOptions.fillColor;
+  misses.forEach(hit => drawCircle(...hit, 1));
+
+  ctx.fillStyle = canvasOptions.fillColor;
+  ctx.strokeStyle = canvasOptions.fillColor;
 
   const pointsCount = hits.length + misses.length;
   const hitsCount = hits.length;
