@@ -20,7 +20,11 @@ function calculateSurface({
     const randomX = randomBetween(0, canvasWidth);
     const randomY = randomBetween(0, canvasHeight);
 
-    randomPoints.push([randomX, randomY]);
+    randomPoints.push([
+      randomX,
+      randomY,
+      randomY * canvasWidth * 4 + randomX * 4 + 3,
+    ]);
   }
 
   return randomPoints;

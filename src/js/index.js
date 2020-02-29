@@ -115,10 +115,9 @@ function calculateSurface() {
   ).data;
 
   for (let i = 0; i < randomPoints.length; i++) {
-    const [randomX, randomY] = randomPoints[i];
+    const [randomX, randomY, imageDataIndex] = randomPoints[i];
 
-    const alpha =
-      imageData[randomY * canvasOptions.width * 4 + randomX * 4 + 3];
+    const alpha = imageData[imageDataIndex];
     if (alpha !== 0) {
       if (!hits.find(equalsPoint(randomX, randomY))) {
         hits.push([randomX, randomY]);
