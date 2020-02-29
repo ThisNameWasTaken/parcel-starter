@@ -29,11 +29,14 @@ const offscreenCanvas = canvas.transferControlToOffscreen();
 /** @type {CanvasRenderingContext2D} */
 const ctx = offscreenCanvas.getContext('2d');
 
-document.body.addEventListener('pointerdown', startDrawing, { passive: true });
+document.body.addEventListener('mousedown', startDrawing, { passive: true });
+document.body.addEventListener('touchstart', startDrawing, { passive: true });
 
-document.body.addEventListener('pointermove', draw, { passive: true });
+document.body.addEventListener('mousemove', draw, { passive: true });
+document.body.addEventListener('touchmove', draw, { passive: true });
 
-document.body.addEventListener('pointerup', stopDrawing, { passive: true });
+document.body.addEventListener('mouseup', stopDrawing, { passive: true });
+document.body.addEventListener('touchend', stopDrawing, { passive: true });
 
 let randomPoints = [];
 
@@ -56,8 +59,8 @@ function startDrawing(event) {
   clearCanvas();
   ctx.beginPath();
   isDrawing = true;
-  prevX = event.clientX;
-  prevY = event.clientY;
+  prevX = event.clientX || event.touches[0].clientX;
+  prevY = event.clientY || event.touches[0].clientY;
 
   pointsGeneratorWorker.postMessage({
     canvasWidth: canvasOptions.width,
@@ -68,12 +71,15 @@ function startDrawing(event) {
 function draw(event) {
   if (!isDrawing) return;
 
+  const clientX = event.clientX || event.touches[0].clientX;
+  const clientY = event.clientY || event.touches[0].clientY;
+
   ctx.moveTo(prevX, prevY);
-  ctx.lineTo(event.clientX, event.clientY);
+  ctx.lineTo(clientX, clientY);
   ctx.stroke();
 
-  prevX = event.clientX;
-  prevY = event.clientY;
+  prevX = clientX;
+  prevY = clientY;
 }
 
 function stopDrawing() {
