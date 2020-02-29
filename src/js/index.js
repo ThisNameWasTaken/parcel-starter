@@ -1,10 +1,5 @@
-const canvasWorker = new Worker('./canvasWorker.js');
-
-canvasWorker.postMessage({ dolor: 'sit' });
-canvasWorker.addEventListener('message', event => {
-  console.log('received');
-  console.log(event);
-});
+// TODO: Make it work with offscreen canvas
+// TODO: Refactor everything inside a class
 
 const canvas = document.getElementById('canvas');
 
@@ -29,8 +24,10 @@ const missOptions = {
 canvas.setAttribute('width', `${canvasOptions.width}px`);
 canvas.setAttribute('height', `${canvasOptions.height}px`);
 
+const offscreenCanvas = canvas.transferControlToOffscreen();
+
 /** @type {CanvasRenderingContext2D} */
-const ctx = canvas.getContext('2d');
+const ctx = offscreenCanvas.getContext('2d');
 
 document.body.addEventListener('pointerdown', startDrawing, { passive: true });
 
@@ -38,22 +35,34 @@ document.body.addEventListener('pointermove', draw, { passive: true });
 
 document.body.addEventListener('pointerup', stopDrawing, { passive: true });
 
-// Draw inner shape
-ctx.fillStyle = penOptions.fillColor;
-ctx.strokeStyle = penOptions.fillColor;
-ctx.lineWidth = penOptions.size;
-ctx.lineCap = 'round';
-ctx.lineJoin = 'round';
+let randomPoints = [];
+
+const pointsGeneratorWorker = new Worker('./pointsGeneratorWorker.js');
+
+pointsGeneratorWorker.addEventListener('message', event => {
+  randomPoints = event.data.randomPoints;
+});
 
 let prevX;
 let prevY;
 let isDrawing = false;
 function startDrawing(event) {
+  ctx.fillStyle = penOptions.fillColor;
+  ctx.strokeStyle = penOptions.fillColor;
+  ctx.lineWidth = penOptions.size;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
   clearCanvas();
   ctx.beginPath();
   isDrawing = true;
   prevX = event.clientX;
   prevY = event.clientY;
+
+  pointsGeneratorWorker.postMessage({
+    canvasWidth: canvasOptions.width,
+    canvasHeight: canvasOptions.height,
+  });
 }
 
 function draw(event) {
@@ -67,7 +76,7 @@ function draw(event) {
   prevY = event.clientY;
 }
 
-function stopDrawing(event) {
+function stopDrawing() {
   ctx.closePath();
   isDrawing = false;
   calculateSurface();
@@ -83,25 +92,14 @@ function drawDot(x, y) {
   ctx.fill();
 }
 
+const equalsPoint = (x, y) => ([_x, _y]) => _x === x && _y === y;
+
 function calculateSurface() {
-  const screenPercentage = 0.01;
-
-  const randomPointsCount = Math.floor(
-    canvasOptions.height * canvasOptions.width * screenPercentage
-  );
-
-  console.log({ randomPointsCount });
-
-  const randomBetween = (start, end) => Math.floor(Math.random() * end + start);
-
   const hits = [];
   const misses = [];
 
-  const equalsPoint = (x, y) => ([_x, _y]) => _x === x && _y === y;
-
-  for (let i = 0; i < randomPointsCount; i++) {
-    const randomX = randomBetween(0, canvasOptions.width);
-    const randomY = randomBetween(0, canvasOptions.height);
+  for (let i = 0; i < randomPoints.length; i++) {
+    const [randomX, randomY] = randomPoints[i];
 
     const alpha = ctx.getImageData(randomX, randomY, 1, 1).data[3];
     if (alpha !== 0) {
@@ -118,14 +116,11 @@ function calculateSurface() {
   ctx.fillStyle = hitOptions.fillColor;
   ctx.strokeStyle = hitOptions.fillColor;
 
-  hits.forEach(hit => drawDot(...hit, 1));
+  hits.forEach(hit => drawDot(...hit));
 
   ctx.fillStyle = missOptions.fillColor;
   ctx.strokeStyle = missOptions.fillColor;
-  misses.forEach(hit => drawDot(...hit, 1));
-
-  ctx.fillStyle = penOptions.fillColor;
-  ctx.strokeStyle = penOptions.fillColor;
+  misses.forEach(hit => drawDot(...hit));
 
   const pointsCount = hits.length + misses.length;
   const hitsCount = hits.length;
@@ -134,4 +129,6 @@ function calculateSurface() {
   );
 
   console.log({ surface });
+
+  return surface;
 }
