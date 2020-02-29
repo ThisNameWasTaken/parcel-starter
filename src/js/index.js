@@ -1,3 +1,5 @@
+const loader = document.querySelector('.loader');
+
 // TODO: Make it work with offscreen canvas
 // TODO: Refactor everything inside a class
 
@@ -85,6 +87,7 @@ function draw(event) {
 function stopDrawing() {
   ctx.closePath();
   isDrawing = false;
+
   calculateSurface();
 }
 
@@ -104,10 +107,18 @@ function calculateSurface() {
   const hits = [];
   const misses = [];
 
+  const imageData = ctx.getImageData(
+    0,
+    0,
+    canvasOptions.width,
+    canvasOptions.height
+  ).data;
+
   for (let i = 0; i < randomPoints.length; i++) {
     const [randomX, randomY] = randomPoints[i];
 
-    const alpha = ctx.getImageData(randomX, randomY, 1, 1).data[3];
+    const alpha =
+      imageData[randomY * canvasOptions.width * 4 + randomX * 4 + 3];
     if (alpha !== 0) {
       if (!hits.find(equalsPoint(randomX, randomY))) {
         hits.push([randomX, randomY]);
@@ -121,7 +132,6 @@ function calculateSurface() {
 
   ctx.fillStyle = hitOptions.fillColor;
   ctx.strokeStyle = hitOptions.fillColor;
-
   hits.forEach(hit => drawDot(...hit));
 
   ctx.fillStyle = missOptions.fillColor;
