@@ -1,0 +1,60 @@
+{
+  "workbench.colorTheme": "One Moon",
+  "workbench.iconTheme": "material-icon-theme",
+  "window.zoomLevel": 1,
+  "terminal.integrated.shell.windows": "C:\\Windows\\System32\\cmd.exe",
+  "terminal.external.windowsExec": "C:\\Windows\\System32\\cmd.exe",
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "editor.minimap.enabled": false,
+  "editor.fontFamily": "Fira Code, Consolas, 'Courier New', monospace",
+  "editor.fontLigatures": "'ss03', 'ss05', 'zero'",
+  "editor.fontSize": 16,
+  "emmet.triggerExpansionOnTab": true,
+  "breadcrumbs.enabled": false,
+  "htmlhint.options": {
+    "doctype-first": false
+  },
+  "prettier.trailingComma": "es5",
+  "explorer.confirmDelete": false,
+  "editor.cursorSmoothCaretAnimation": true,
+  "editor.smoothScrolling": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "todo-tree.highlights.customHighlight": {
+    "TODO:": {
+      "foreground": "#242B2E",
+      "background": "#FFD54F"
+    },
+    "FIXME:": {
+      "foreground": "#EEEEEE",
+      "background": "#F44336"
+    }
+  },
+  "todo-tree.general.tags": ["TODO:", "FIXME:"],
+  "task.problemMatchers.neverPrompt": {
+    "shell": true
+  },
+  "explorer.confirmDragAndDrop": false,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "prettier.singleQuote": true,
+  "prettier.useEditorConfig": false,
+  "javascript.implicitProjectConfig.checkJs": true,
+  "editor.tabSize": 2,
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact"
+  },
+  "terminal.integrated.rendererType": "experimentalWebgl",
+  "editor.wordWrap": "on",
+  "editor.formatOnSave": true,
+  "cSpell.userWords": ["transclude"],
+  "html.format.wrapAttributes": "force-expand-multiline",
+  "git.confirmSync": false,
+  "todo-tree.tree.showScanModeButton": false
+}
