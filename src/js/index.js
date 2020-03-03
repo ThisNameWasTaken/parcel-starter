@@ -42,9 +42,9 @@ document.body.addEventListener('touchend', stopDrawing, { passive: true });
 
 let randomPoints = [];
 
-const pointsGeneratorWorker = new Worker('./pointsGeneratorWorker.js');
+const pointGeneratorWorker = new Worker('./pointGenerator.worker.js');
 
-pointsGeneratorWorker.addEventListener('message', event => {
+pointGeneratorWorker.addEventListener('message', event => {
   randomPoints = event.data.randomPoints;
 });
 
@@ -64,7 +64,7 @@ function startDrawing(event) {
   prevX = event.clientX || event.touches[0].clientX;
   prevY = event.clientY || event.touches[0].clientY;
 
-  pointsGeneratorWorker.postMessage({
+  pointGeneratorWorker.postMessage({
     canvasWidth: canvasOptions.width,
     canvasHeight: canvasOptions.height,
   });
@@ -101,49 +101,49 @@ function drawDot(x, y) {
   ctx.fill();
 }
 
-const equalsPoint = (x, y) => ([_x, _y]) => _x === x && _y === y;
+let lastTimestamp = undefined;
+
+const surfaceEstimatorWorker = new Worker('./surfaceEstimator.worker.js');
+surfaceEstimatorWorker.addEventListener(
+  'message',
+  ({ data: { hits, misses, estimatedSurface, timestamp } }) => {
+    // TODO: Reset the worker instead of using a timestamp
+    if (timestamp !== lastTimestamp) return;
+
+    console.log({ estimatedSurface });
+
+    ctx.fillStyle = hitOptions.fillColor;
+    ctx.strokeStyle = hitOptions.fillColor;
+    hits.forEach(hit => drawDot(...hit));
+
+    ctx.fillStyle = missOptions.fillColor;
+    ctx.strokeStyle = missOptions.fillColor;
+    misses.forEach(hit => drawDot(...hit));
+  }
+);
+
+const surfaceCalculatorWorker = new Worker('./surfaceCalculator.worker.js');
+surfaceCalculatorWorker.addEventListener('message', ({ data: { surface } }) => {
+  console.log({ surface });
+});
 
 function calculateSurface() {
-  const hits = [];
-  const misses = [];
+  const canvasWidth = canvasOptions.width;
+  const canvasHeight = canvasOptions.height;
 
-  const imageData = ctx.getImageData(
-    0,
-    0,
-    canvasOptions.width,
-    canvasOptions.height
-  ).data;
+  const imageData = ctx.getImageData(0, 0, canvasWidth, canvasHeight).data;
 
-  for (let i = 0; i < randomPoints.length; i++) {
-    const [randomX, randomY, imageDataIndex] = randomPoints[i];
+  lastTimestamp = performance.now();
 
-    const alpha = imageData[imageDataIndex];
-    if (alpha !== 0) {
-      if (!hits.find(equalsPoint(randomX, randomY))) {
-        hits.push([randomX, randomY]);
-      }
-    } else {
-      if (!misses.find(equalsPoint(randomX, randomY))) {
-        misses.push([randomX, randomY]);
-      }
-    }
-  }
+  surfaceEstimatorWorker.postMessage({
+    imageData,
+    randomPoints,
+    canvasWidth,
+    canvasHeight,
+    timestamp: lastTimestamp,
+  });
 
-  ctx.fillStyle = hitOptions.fillColor;
-  ctx.strokeStyle = hitOptions.fillColor;
-  hits.forEach(hit => drawDot(...hit));
-
-  ctx.fillStyle = missOptions.fillColor;
-  ctx.strokeStyle = missOptions.fillColor;
-  misses.forEach(hit => drawDot(...hit));
-
-  const pointsCount = hits.length + misses.length;
-  const hitsCount = hits.length;
-  const surface = Math.floor(
-    (hitsCount / pointsCount) * (canvasOptions.width * canvasOptions.height)
-  );
-
-  console.log({ surface });
-
-  return surface;
+  surfaceCalculatorWorker.postMessage({
+    imageData,
+  });
 }
