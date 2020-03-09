@@ -1,29 +1,24 @@
-# Parcel Starter
+# Tehnici de Simluare - Tema 1
 
-This is a simple [Parcel](https://parceljs.org/) boilerplate to get you up and running.
+## Estimarea ariei unei forme geometrice neregulate (Monte Carlo)
 
-## Scripts
+### Pasi
 
-```sh
-npm start
-```
+- Se alege o forma geometrice a carei arie este usor de calculat (ex: un patrat, un dreptunghi etc).
+- Se calculeaza aria formei alese.
+- In interiorul formei alese se desenaza forma geometrice neregulata (ex: o floare, un copac etc).
+- Se genereaza puncte la intamplare.
+- Se numara cate puncte sunt in interiorul formei geometrice neregulate.
+- Se estimeaza aria formei neregulate ca fiind **numarul de puncte din interior** / **numarul de puncte generate la intamplare** \* **aria figurii geometrice usor de calculat**.
 
-Starts development server on [http://localhost:1234](http://localhost:1234).
+### Detalii Implementare
 
-To change the host and port run `npm start -- --host local.my-host.com --port 3000`
+- Pentru aceasta tema am folosit JavaScript Html si Css.
+- Partea de desenare este realizata cu ajutorul elementului `<canvas></canvas>`.
+- In momentul in care utilizatorul incepe sa deseneze, se genereaza puncte aleator intr-un Web Worker.
+- Dupa ce a terminat desenul:
+  - Intr-un Web Worker calculez aria propriu-zisa a desenului ca fiind numarul de pixeli al caror valoare alpha este mai strict mare ca 0.
+  - In alt Web Worker estimez aria dupa metoda Monte Carlo. Un punct este in interirorul formei geometrice daca valoarea alpha a pixelului de la coordonata respectiva este mai mare strict ca 0. In acelasi Web Worker desenez punctele din interior cu verde si cele din exteriror cu rosu.
+  - Dupa ce ambii Web Workeri au emis un mesaj afisez cele doua arii.
 
-```sh
-npm run build
-```
-
-Builds for production into a folder called `dist`.
-
-To change the folder's name run `npm run build -- -out-dir custom-named-folder`.
-
-For more flags checkout [Parcel's CLI](https://parceljs.org/cli.html) Docs.
-
-## Included packages
-
-The only runtime dependency is [normalize.css](https://necolas.github.io/normalize.css/) which a lightweight css framework that makes browsers render all elements more consistently.
-
-Parcel and [SASS](https://sass-lang.com/) are the only dev dependencies. However if you wish to use things such as [TypeScript](https://www.typescriptlang.org/), [EJS](https://ejs.co/) or any other language supersets, Parcel will automatically add those as dev dependencies.
+**NB:** Prin valoare alpha inteleg nivelul de transparenta al unui pixel (0 = transparent, 255 = opac).
