@@ -1,4 +1,16 @@
+// @use '@material/snackbar/mdc-snackbar';
+
+@import '@material/snackbar/dist/mdc.snackbar.css';
+@import '@material/icon-button/dist/mdc.icon-button.css';
+@import '@material/button/dist/mdc.button.css';
+@import '@material/ripple/dist/mdc.ripple.css';
+@import '@material/card/dist/mdc.card.css';
+@import '@material/slider/dist/mdc.slider.css';
 @import 'normalize.css/normalize.css';
+
+:root {
+  --mdc-theme-secondary: #48f;
+}
 
 body {
   font-family: Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen,
@@ -8,4 +20,46 @@ body {
 html,
 body {
   overflow: hidden;
+}
+
+.mdc-snackbar__actions {
+  .mdc-icon-button {
+    color: #fff;
+
+    &::before,
+    &::after {
+      background-color: #fff;
+    }
+  }
+}
+
+.mdc-snackbar__dismiss.mdc-snackbar__dismiss {
+  width: 48px;
+  height: 48px;
+  padding: 12px;
+  font-size: 24px;
+}
+
+#brush-controls {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+
+  .mdc-card {
+    max-width: 350px;
+    width: 100%;
+    padding: 0rem 16px;
+  }
+}
+
+#canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  // transform: translateY(48px);
 }

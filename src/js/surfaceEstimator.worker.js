@@ -9,7 +9,6 @@ function estimateSurface({
   randomPoints,
   canvasWidth,
   canvasHeight,
-  timestamp,
 }) {
   const hits = [];
   const misses = [];
@@ -35,5 +34,5 @@ function estimateSurface({
     (hitsCount / pointsCount) * (canvasWidth * canvasHeight)
   );
 
-  return { estimatedSurface, hits, misses, timestamp };
+  return { estimatedSurface, hits, misses };
 }
