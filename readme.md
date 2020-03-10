@@ -6,7 +6,7 @@
 
 - Se alege o forma geometrice a carei arie este usor de calculat (ex: un patrat, un dreptunghi etc).
 - Se calculeaza aria formei alese.
-- In interiorul formei alese se desenaza forma geometrice neregulata (ex: o floare, un copac etc).
+- In interiorul formei alese se desenaza forma geometrica neregulata (ex: o floare, un copac etc).
 - Se genereaza puncte la intamplare.
 - Se numara cate puncte sunt in interiorul formei geometrice neregulate.
 - Se estimeaza aria formei neregulate ca fiind **numarul de puncte din interior** / **numarul de puncte generate la intamplare** \* **aria figurii geometrice usor de calculat**.
